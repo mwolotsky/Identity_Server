@@ -384,12 +384,19 @@ while True:
             else:
                 #For testing purposes sent is always 0 referring to the senders most recent DSA key
                 sent = 0.0
+                #Generate a Signature using the sender's Private DSA Key
                 info = loadKeys()
                 private = info["Users"][username]["DSA"]
                 sig = dsa.constructDSAPrivate(private)
+                #Stamped creates a single string representation of the command
+                #So that it can be hashed and used as an accurate signature
                 stamped = stamp(output[0],output[1],output[2],sent)
                 signature = dsa.signMessage(sig, stamped)
+                #Send the data over SSL. Socket = 
+                #GetSend:Users/<sender>/TigerText:[target,RSA,0]:sent:sig
+                #Target refers to user to get key of, 0 refers to the current key
                 sslSocket.write("{}:{}:{}:{}:{}".format(output[0],output[1],output[2],sent,signature))
+                #Receive the requested key
                 received = listen()
                 received = received.replace("\\n","\n")
                 print received
